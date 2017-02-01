@@ -230,27 +230,6 @@ public struct _StringBuffer {
       return true
     }
 
-    // Optimization: even if the buffer is shared, but the substring we are
-    // trying to grow is located at the end of the buffer, it can be grown in
-    // place.  The operation should be implemented in a thread-safe way,
-    // though.
-    //
-    // if usedEnd == bounds.upperBound {
-    //  usedEnd = newUsedEnd
-    //  return true
-    // }
-
-    // &StringBufferIVars.usedEnd
-    let usedEndPhysicalPtr = UnsafeMutableRawPointer(_storage._value)
-      .assumingMemoryBound(to: Optional<UnsafeRawPointer>.self)
-    // Create a temp var to hold the exchanged `expected` value.
-    var expected : UnsafeRawPointer? = bounds.upperBound
-    if _stdlib_atomicCompareExchangeStrongPtr(
-      object: usedEndPhysicalPtr, expected: &expected,
-      desired: UnsafeRawPointer(newUsedEnd)) {
-      return true
-    }
-
     return false
   }
 
